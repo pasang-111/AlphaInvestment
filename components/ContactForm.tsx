@@ -3,7 +3,7 @@ import { useState } from "react";
 export default function ContactForm() {
   const [st, setSt] = useState<"idle" | "sending" | "ok" | "err">("idle"), [msg, setMsg] = useState("");
   async function submit(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault(); const form = e.currentTarget; setSt("sending"); const data = Object.fromEntries(new FormData(form));
+    e.preventDefault(); const form = e.currentTarget; setSt("sending"); const fd = new FormData(form), data: Record<string, string> = {}; ["name", "email", "phone", "topic", "message", "website"].forEach(k => { data[k] = String(fd.get(k) ?? ""); });
     const r = await fetch("/api/contact", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(data) });
     const j = await r.json().catch(() => ({})); setMsg(j.error ?? ""); setSt(r.ok ? "ok" : "err"); if (r.ok) form.reset();
   }
